@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
 import * as bcrypt from 'bcrypt';
@@ -8,10 +8,12 @@ export class UserService {
   @Inject()
   private readonly prisma: PrismaService;
 
-  async user(UserWhereUniqueInput: Prisma.UserWhereUniqueInput): Promise<User | null> {
-    return await this.prisma.user.findUnique({
+  async user(UserWhereUniqueInput: Prisma.UserWhereUniqueInput): Promise<User> {
+    const user = await this.prisma.user.findUnique({
       where: UserWhereUniqueInput,
     });
+    if (!user) throw new NotFoundException('User not found');
+    return user;
   }
   async createUser(data: Prisma.UserCreateInput) {
     const hashPassword = await bcrypt.hash(data.password, 10);
