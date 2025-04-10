@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { QuestionsService } from './questions.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
@@ -17,10 +18,10 @@ import { AuthGuard } from 'src/auth/auth.guard';
 export class QuestionsController {
   constructor(private readonly questionsService: QuestionsService) {}
 
-  @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createQuestionDto: CreateQuestionDto) {
-    return this.questionsService.create(createQuestionDto);
+  @UseGuards(AuthGuard)
+  create(@Body() createQuestionDto: CreateQuestionDto, @Request() req: any) {
+    return this.questionsService.create(createQuestionDto, req.sub);
   }
 
   @Get()
